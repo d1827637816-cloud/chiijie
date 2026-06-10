@@ -25,6 +25,39 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+const SHIPPING_FALLBACK = [
+  { province: 'DKI Jakarta', city: 'Jakarta Pusat', regular_cost: 15000, express_cost: 25000, overnight_cost: 40000 },
+  { province: 'DKI Jakarta', city: 'Jakarta Utara', regular_cost: 15000, express_cost: 25000, overnight_cost: 40000 },
+  { province: 'DKI Jakarta', city: 'Jakarta Timur', regular_cost: 15000, express_cost: 25000, overnight_cost: 40000 },
+  { province: 'DKI Jakarta', city: 'Jakarta Barat', regular_cost: 15000, express_cost: 25000, overnight_cost: 40000 },
+  { province: 'DKI Jakarta', city: 'Jakarta Selatan', regular_cost: 15000, express_cost: 25000, overnight_cost: 40000 },
+  { province: 'DKI Jakarta', city: 'Kepulauan Seribu', regular_cost: 25000, express_cost: 35000, overnight_cost: 50000 },
+  { province: 'Jawa Barat', city: 'Bandung', regular_cost: 20000, express_cost: 30000, overnight_cost: 45000 },
+  { province: 'Jawa Barat', city: 'Bekasi', regular_cost: 18000, express_cost: 28000, overnight_cost: 42000 },
+  { province: 'Jawa Barat', city: 'Bogor', regular_cost: 18000, express_cost: 28000, overnight_cost: 42000 },
+  { province: 'Jawa Barat', city: 'Depok', regular_cost: 18000, express_cost: 28000, overnight_cost: 42000 },
+  { province: 'Jawa Barat', city: 'Tangerang', regular_cost: 18000, express_cost: 28000, overnight_cost: 42000 },
+  { province: 'Jawa Barat', city: 'Serang', regular_cost: 25000, express_cost: 35000, overnight_cost: 50000 },
+  { province: 'Jawa Tengah', city: 'Semarang', regular_cost: 25000, express_cost: 35000, overnight_cost: 50000 },
+  { province: 'Jawa Tengah', city: 'Yogyakarta', regular_cost: 28000, express_cost: 38000, overnight_cost: 53000 },
+  { province: 'Jawa Tengah', city: 'Solo', regular_cost: 28000, express_cost: 38000, overnight_cost: 53000 },
+  { province: 'Jawa Tengah', city: 'Salatiga', regular_cost: 28000, express_cost: 38000, overnight_cost: 53000 }
+];
+
+function getStaticProvinces() {
+  return [...new Set(SHIPPING_FALLBACK.map(item => item.province))].sort();
+}
+
+function getStaticCities(province) {
+  return SHIPPING_FALLBACK.filter(item => item.province === province).map(item => item.city).sort();
+}
+
+function getStaticShippingCosts(province, city) {
+  return SHIPPING_FALLBACK.filter(item => {
+    return (!province || item.province === province) && (!city || item.city === city);
+  });
+}
+
 // Midtrans Snap client
 const snapClient = new snap({
   isProduction: process.env.NODE_ENV === 'production' || false,
@@ -83,10 +116,11 @@ app.get('/api/shipping-costs', async (req, res) => {
     const [results] = await connection.execute(query, params);
     connection.release();
 
-    res.json(results);
+    return res.json(results);
   } catch (error) {
     console.error('Shipping costs error:', error);
-    res.status(500).json({ error: 'Failed to fetch shipping costs' });
+    const fallback = getStaticShippingCosts(req.query.province, req.query.city);
+    return res.json(fallback);
   }
 });
 
@@ -102,7 +136,7 @@ app.get('/api/provinces', async (req, res) => {
     res.json(provinces);
   } catch (error) {
     console.error('Provinces error:', error);
-    res.status(500).json({ error: 'Failed to fetch provinces' });
+    res.json(getStaticProvinces());
   }
 });
 
@@ -120,7 +154,7 @@ app.get('/api/cities/:province', async (req, res) => {
     res.json(cities);
   } catch (error) {
     console.error('Cities error:', error);
-    res.status(500).json({ error: 'Failed to fetch cities' });
+    res.json(getStaticCities(req.params.province));
   }
 });
 
