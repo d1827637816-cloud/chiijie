@@ -112,4 +112,89 @@ INSERT INTO `order_status_history` (`order_id`, `step`, `status`, `location`, `u
 ('LXM-00000001', 1, 'Pesanan diterima', 'Gudang LUXE.M', NOW()),
 ('LXM-00000001', 2, 'Diproses', 'Pusat Pemenuhan', NOW());
 
+-- Table: shipping_costs (Regional pricing)
+CREATE TABLE IF NOT EXISTS `shipping_costs` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `province` VARCHAR(100) NOT NULL,
+  `city` VARCHAR(100) NOT NULL,
+  `regular_cost` INT UNSIGNED NOT NULL,
+  `express_cost` INT UNSIGNED NOT NULL,
+  `overnight_cost` INT UNSIGNED NOT NULL,
+  `active` BOOLEAN DEFAULT TRUE,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_province_city` (`province`, `city`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table: payment_transactions
+CREATE TABLE IF NOT EXISTS `payment_transactions` (
+  `id` VARCHAR(64) NOT NULL,
+  `order_id` VARCHAR(32) NOT NULL,
+  `transaction_id` VARCHAR(255) DEFAULT NULL,
+  `amount` INT UNSIGNED NOT NULL,
+  `payment_method` VARCHAR(50) NOT NULL,
+  `status` VARCHAR(50) NOT NULL DEFAULT 'pending',
+  `snap_token` VARCHAR(255) DEFAULT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `paid_at` DATETIME DEFAULT NULL,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_order_id` (`order_id`),
+  KEY `idx_status` (`status`),
+  CONSTRAINT `fk_payment_orders` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Seed shipping costs data for different regions
+INSERT INTO `shipping_costs` (`province`, `city`, `regular_cost`, `express_cost`, `overnight_cost`) VALUES
+-- DKI Jakarta
+('DKI Jakarta', 'Jakarta Pusat', 15000, 25000, 40000),
+('DKI Jakarta', 'Jakarta Utara', 15000, 25000, 40000),
+('DKI Jakarta', 'Jakarta Timur', 15000, 25000, 40000),
+('DKI Jakarta', 'Jakarta Barat', 15000, 25000, 40000),
+('DKI Jakarta', 'Jakarta Selatan', 15000, 25000, 40000),
+('DKI Jakarta', 'Kepulauan Seribu', 25000, 35000, 50000),
+
+-- Jawa Barat
+('Jawa Barat', 'Bandung', 20000, 30000, 45000),
+('Jawa Barat', 'Bekasi', 18000, 28000, 42000),
+('Jawa Barat', 'Bogor', 18000, 28000, 42000),
+('Jawa Barat', 'Depok', 18000, 28000, 42000),
+('Jawa Barat', 'Tangerang', 18000, 28000, 42000),
+('Jawa Barat', 'Serang', 25000, 35000, 50000),
+
+-- Jawa Tengah
+('Jawa Tengah', 'Semarang', 25000, 35000, 50000),
+('Jawa Tengah', 'Yogyakarta', 28000, 38000, 53000),
+('Jawa Tengah', 'Solo', 28000, 38000, 53000),
+('Jawa Tengah', 'Salatiga', 28000, 38000, 53000),
+
+-- Jawa Timur
+('Jawa Timur', 'Surabaya', 28000, 38000, 53000),
+('Jawa Timur', 'Malang', 32000, 42000, 57000),
+('Jawa Timur', 'Gresik', 28000, 38000, 53000),
+('Jawa Timur', 'Sidoarjo', 28000, 38000, 53000),
+
+-- Bali
+('Bali', 'Denpasar', 35000, 45000, 60000),
+('Bali', 'Ubud', 38000, 48000, 63000),
+('Bali', 'Kuta', 35000, 45000, 60000),
+
+-- Sumatera Utara
+('Sumatera Utara', 'Medan', 35000, 45000, 60000),
+
+-- Sumatera Selatan
+('Sumatera Selatan', 'Palembang', 35000, 45000, 60000),
+
+-- Sulawesi Selatan
+('Sulawesi Selatan', 'Makassar', 40000, 50000, 65000),
+
+-- Kalimantan Timur
+('Kalimantan Timur', 'Samarinda', 40000, 50000, 65000),
+('Kalimantan Timur', 'Balikpapan', 40000, 50000, 65000),
+
+-- Jawa (kota2 lainnya)
+('Jawa Barat', 'Tasikmalaya', 28000, 38000, 53000),
+('Jawa Barat', 'Ciamis', 28000, 38000, 53000),
+('Jawa Barat', 'Karawang', 20000, 30000, 45000);
+
 -- End of schema
