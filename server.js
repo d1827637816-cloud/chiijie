@@ -9,10 +9,15 @@ const mysql = require('mysql2/promise');
 const bodyParser = require('body-parser');
 const snap = require('midtrans-client').Snap;
 
+// Import payment modules
+const PaymentHandler = require('./lib/payment-handler');
+const { MidtransSignatureValidator, RateLimiter, IdempotencyValidator } = require('./lib/security-utils');
+const TransactionLogger = require('./lib/transaction-logger');
+
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Database connection pool
 const pool = mysql.createPool({
