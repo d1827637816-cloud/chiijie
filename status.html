@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Pesanan | LUXE.M</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="nav-icons" style="position:absolute; right:4rem; top:1.4rem;">
+            <a href="index.html" style="color:var(--text-main); font-weight:700;">Kembali ke Toko</a>
+        </div>
+    </header>
+    <main style="padding: 8rem 4rem 4rem; max-width: 980px; margin: 0 auto;">
+        <h1 style="font-size:2.8rem; margin-bottom:1rem; letter-spacing:2px; text-transform:uppercase;">Status Pesanan</h1>
+        <p style="font-size:1rem; line-height:2; color:#444; margin-bottom:2rem;">Masukkan ID pesanan untuk melihat status dan lokasi terkini dari pengiriman Anda.</p>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:2rem;">
+            <input id="status-order-id" type="text" placeholder="Masukkan ID Pesanan" style="flex:1; padding:1rem 1.2rem; border:1px solid #ddd; border-radius:0.9rem;">
+            <button id="status-check" class="btn" style="background:#000;color:#fff; border:none; padding:1rem 1.8rem;">Cek Status</button>
+        </div>
+        <div id="status-result"></div>
+    </main>
+    <script src="status.js"></script>
+</body>
+</html>

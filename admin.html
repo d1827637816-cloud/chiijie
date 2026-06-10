@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | LUXE.M</title>
+    <meta name="description" content="Halaman admin LUXE.M untuk melihat dan mengelola katalog produk secara lokal.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="admin-login-modal" class="modal active">
+        <div class="modal-content admin-login-modal-content">
+            <div class="modal-logo">LUXE.M Admin</div>
+            <h2>Masuk Admin</h2>
+            <p>Masukkan kata sandi admin untuk mengakses dashboard monitoring.</p>
+            <form id="admin-login-form">
+                <input type="password" id="admin-pass" placeholder="Password admin" autocomplete="current-password" required>
+                <button type="submit" class="btn modal-btn">Masuk</button>
+            </form>
+            <p class="modal-footer">Akses hanya untuk administrator.</p>
+        </div>
+    </div>
+
+    <main id="admin-dashboard" class="admin-page" hidden>
+        <header class="admin-header">
+            <div>
+                <p style="font-size:0.85rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Admin Dashboard</p>
+                <h1>Kelola Produk LUXE.M</h1>
+            </div>
+            <div>
+                <button class="btn-back-home" id="admin-logout">
+                    <i class="fa-solid fa-right-from-bracket" style="margin-right:0.6rem;"></i> Logout
+                </button>
+                <button class="btn-back-home" onclick="window.location.href='index.html'">
+                    <i class="fa-solid fa-arrow-left" style="margin-right:0.6rem;"></i> Kembali ke Toko
+                </button>
+            </div>
+        </header>
+
+        <section class="admin-panel-top">
+            <div class="admin-welcome-card">
+                <div>
+                    <p class="eyebrow">SELAMAT DATANG, ADMIN</p>
+                    <h2>Dashboard Kontrol LUXE.M</h2>
+                    <p class="admin-welcome-text">Pantau penjualan, pelanggan, dan produk dengan tampilan dashboard yang profesional. Gunakan fitur inti untuk mengambil keputusan lebih cepat.</p>
+                </div>
+                <div class="admin-quick-actions">
+                    <button class="btn btn-accent" id="admin-add-action"><i class="fa-solid fa-plus"></i> Tambah Produk</button>
+                    <button class="btn btn-secondary" id="admin-refresh-all"><i class="fa-solid fa-arrows-rotate"></i> Refresh Semua</button>
+                    <button class="btn btn-outline" id="admin-export-data"><i class="fa-solid fa-file-export"></i> Export Pesanan</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="admin-top">
+            <div class="admin-card">
+                <h3>Total Produk</h3>
+                <p id="admin-total-products">0</p>
+            </div>
+            <div class="admin-card">
+                <h3>Kategori Tersedia</h3>
+                <p id="admin-total-categories">0</p>
+            </div>
+            <div class="admin-card">
+                <h3>Total Pesanan</h3>
+                <p id="admin-total-orders">0</p>
+            </div>
+        </section>
+
+        <section class="admin-card" style="margin-bottom:2rem;">
+            <h3>Monitoring Pesanan Realtime</h3>
+            <div class="admin-controls">
+                <input type="text" id="admin-order-search" placeholder="Cari pesanan berdasarkan ID atau nama customer...">
+                <button id="admin-refresh-orders">Perbarui Status</button>
+            </div>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID Pesanan</th>
+                        <th>Nama</th>
+                        <th>Status</th>
+                        <th>Jumlah Item</th>
+                        <th>Total</th>
+                        <th>Diperbarui</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-order-table"></tbody>
+            </table>
+        </section>
+
+        <section class="admin-card admin-activity-card">
+            <h3>Aktivitas Terbaru</h3>
+            <ul class="activity-list">
+                <li class="activity-item"><div><strong>Pesanan baru diterima</strong><span>ID LXM-00000002 masuk ke dalam sistem.</span></div><time>5 menit lalu</time></li>
+                <li class="activity-item"><div><strong>Produk baru ditambahkan</strong><span>Kaos olahraga premium berhasil dipublikasikan.</span></div><time>15 menit lalu</time></li>
+                <li class="activity-item"><div><strong>Pembeli baru terdaftar</strong><span>Anton Pratama melakukan pembelian pertama.</span></div><time>30 menit lalu</time></li>
+            </ul>
+        </section>
+
+        <section class="admin-card">
+            <h3>Dashboard Pembeli</h3>
+            <div class="admin-top" style="margin-bottom:1.5rem;">
+                <div class="admin-card">
+                    <h3>Total Pembeli</h3>
+                    <p id="admin-total-customers">0</p>
+                </div>
+                <div class="admin-card">
+                    <h3>Total Pendapatan</h3>
+                    <p id="admin-total-revenue">Rp 0</p>
+                </div>
+                <div class="admin-card">
+                    <h3>Pesanan Selesai</h3>
+                    <p id="admin-completed-orders">0</p>
+                </div>
+            </div>
+            <div class="admin-controls">
+                <input type="text" id="admin-customer-search" placeholder="Cari pembeli berdasarkan nama, email, atau kota...">
+                <button id="admin-refresh-customers">Perbarui Data</button>
+            </div>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Telepon</th>
+                        <th>Kota</th>
+                        <th>Pesanan</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-customer-table"></tbody>
+            </table>
+        </section>
+
+        <section class="admin-card">
+            <h3>Riwayat Pembelian</h3>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID Pesanan</th>
+                        <th>Pembeli</th>
+                        <th>Tanggal</th>
+                        <th>Total</th>
+                        <th>Status Terakhir</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-history-table"></tbody>
+            </table>
+        </section>
+
+        <section class="admin-controls">
+            <input type="text" id="admin-search" placeholder="Cari berdasarkan nama, brand, atau kategori...">
+            <select id="admin-category-filter">
+                <option value="all">Semua Kategori</option>
+                <option value="pria">Pria</option>
+                <option value="wanita">Wanita</option>
+                <option value="anak">Anak-anak</option>
+                <option value="luxury">Luxury</option>
+            </select>
+            <button id="admin-reset">Reset Filter</button>
+        </section>
+
+        <section>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Gambar</th>
+                        <th>Nama Produk</th>
+                        <th>Brand</th>
+                        <th>Kategori</th>
+                        <th>Harga</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-product-table"></tbody>
+            </table>
+        </section>
+
+        <section class="admin-form">
+            <h3>Tambah Produk Baru</h3>
+            <div class="admin-form-row">
+                <input type="text" id="admin-new-name" placeholder="Nama Produk" required>
+                <input type="text" id="admin-new-brand" placeholder="Brand" required>
+            </div>
+            <div class="admin-form-row">
+                <input type="number" id="admin-new-price" placeholder="Harga (dalam Rupiah)" required>
+                <select id="admin-new-category">
+                    <option value="pria">Pria</option>
+                    <option value="wanita">Wanita</option>
+                    <option value="anak">Anak-anak</option>
+                    <option value="luxury">Luxury</option>
+                </select>
+            </div>
+            <div class="admin-form-row">
+                <input type="text" id="admin-new-image" placeholder="URL gambar (opsional)">
+                <input type="file" id="admin-new-image-file" accept="image/*">
+            </div>
+            <div class="admin-form-row">
+                <input type="text" id="admin-new-id" placeholder="ID produk (opsional)">
+                <div class="admin-file-help">Upload file dari laptop untuk menambahkan gambar produk langsung.</div>
+            </div>
+            <div class="admin-form-row admin-image-preview-row">
+                <div class="admin-image-preview-card">
+                    <span>Preview Gambar Produk</span>
+                    <img id="admin-image-preview" src="data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='520' height='680'><rect width='520' height='680' fill='%23f0f0f0'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial,sans-serif' font-size='28' fill='%23999'>No Image</text></svg>" alt="Preview gambar produk">
+                </div>
+            </div>
+            <button id="admin-add-product">Tambahkan Produk</button>
+            <p class="admin-note">Perubahan ini disimpan di browser Anda dan dapat dilihat ulang saat membuka kembali halaman admin di perangkat ini.</p>
+        </section>
+    </main>
+    <script src="admin.js"></script>
+</body>
+</html>

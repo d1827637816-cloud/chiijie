@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXE.M | Fashion Premium Indonesia</title>
+    <meta name="description" content="E-commerce fashion premium. Temukan tren terbaru untuk Pria, Wanita, dan Anak-anak.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header>
+        <ul class="nav-links">
+            <li><a href="#" class="nav-cat" data-cat="wanita">Wanita</a></li>
+            <li><a href="#" class="nav-cat active-nav" data-cat="pria">Pria</a></li>
+            <li><a href="#" class="nav-cat" data-cat="anak">Anak-anak</a></li>
+            <li><a href="#" class="nav-cat" data-cat="luxury">Luxury</a></li>
+        </ul>
+
+        <a href="index.html" class="logo">LUXE.M</a>
+
+        <div class="nav-icons">
+            <i class="fa-solid fa-magnifying-glass" id="search-trigger" title="Cari Produk"></i>
+            <i class="fa-regular fa-user" id="user-trigger" title="Masuk / Daftar"></i>
+            <i class="fa-regular fa-heart" id="wishlist-trigger" title="Wishlist"></i>
+            <div class="cart-icon-wrapper" id="cart-trigger" title="Keranjang">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== SEARCH OVERLAY ===== -->
+    <div id="search-overlay" class="overlay">
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass" style="color:white; font-size:1.5rem;"></i>
+            <input type="text" placeholder="Cari produk, brand, atau kategori..." id="search-input" autocomplete="off">
+            <i class="fa-solid fa-xmark close-overlay"></i>
+        </div>
+        <div id="search-results"></div>
+    </div>
+
+    <!-- ===== LOGIN MODAL ===== -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark close-modal"></i>
+            <div class="modal-logo">LUXE.M</div>
+            <h2>Selamat Datang</h2>
+            <p>Masuk untuk mendapatkan promo menarik & wishlist tersimpan.</p>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-pass" placeholder="Password" required>
+                <div class="forgot"><a href="#">Lupa password?</a></div>
+                <button type="submit" class="btn modal-btn">Masuk</button>
+            </form>
+            <p class="modal-footer">Belum punya akun? <a href="#" id="switch-to-register">Daftar sekarang</a></p>
+        </div>
+    </div>
+
+    <!-- ===== CART DRAWER ===== -->
+    <div id="cart-drawer" class="drawer">
+        <div class="drawer-header">
+            <h3>Keranjang Saya (<span id="cart-drawer-count">0</span>)</h3>
+            <i class="fa-solid fa-xmark close-drawer"></i>
+        </div>
+        <div class="drawer-body" id="cart-items">
+            <div class="empty-cart">
+                <i class="fa-solid fa-cart-shopping" style="font-size:2.5rem; color:#ddd; margin-bottom:1rem;"></i>
+                <p>Keranjang Anda kosong.</p>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <div class="total">
+                <span>Total:</span>
+                <span id="cart-total">Rp 0</span>
+            </div>
+            <button class="btn checkout-btn">
+                <i class="fa-solid fa-lock" style="margin-right:8px;"></i>Checkout Sekarang
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== DRAWER BACKDROP ===== -->
+    <div id="drawer-backdrop" class="drawer-backdrop"></div>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="hero">
+        <img src="hero_banner_men_fashion_1780400311037.png" alt="Men's Fashion Hero" class="hero-img" id="hero-img">
+        <div class="hero-content">
+            <div class="hero-tag" id="hero-tag">Koleksi Pria</div>
+            <h1 id="hero-title">ESSENTIALS <br>FOR HIM</h1>
+            <p id="hero-sub">Elevate your daily rotation with our curated collection of premium menswear.</p>
+            <a href="#shop" class="btn" id="hero-btn">Belanja Sekarang</a>
+        </div>
+    </section>
+
+    <!-- ===== CATEGORY FILTER TABS ===== -->
+    <section class="section" id="shop">
+        <div class="section-title">
+            <h2 id="section-heading">PRODUK TERBARU — PRIA</h2>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">Semua</button>
+                <button class="filter-tab" data-filter="apparel">Apparel</button>
+            </div>
+        </div>
+        <div class="product-grid" id="product-grid">
+            <!-- Dynamically rendered by JS -->
+        </div>
+        <div id="no-results" style="display:none; text-align:center; padding:4rem; color:#999;">
+            <i class="fa-solid fa-box-open" style="font-size:3rem; margin-bottom:1rem;"></i>
+            <p>Tidak ada produk ditemukan.</p>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Layanan Pelanggan</h4>
+                <ul>
+                    <li><a href="contact.html">Bantuan &amp; Kontak</a></li>
+                    <li><a href="payment.html">Metode Pembayaran</a></li>
+                    <li><a href="status.html">Status Pesanan</a></li>
+                    <li><a href="history.html">Riwayat Pembelian</a></li>
+                    <li><a href="returns.html">Pengembalian Produk</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Tentang Kami</h4>
+                <ul>
+                    <li><a href="about.html">Kisah Brand</a></li>
+                    <li><a href="career.html">Karier</a></li>
+                    <li><a href="privacy.html">Privasi &amp; Keamanan</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="admin.html">Admin Panel</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Kategori</h4>
+                <ul>
+                    <li><a href="#shop" onclick="switchCategory('pria')">Pakaian Pria</a></li>
+                    <li><a href="#shop" onclick="switchCategory('wanita')">Pakaian Wanita</a></li>
+                    <li><a href="#shop" onclick="switchCategory('anak')">Pakaian Anak</a></li>
+                    <li><a href="#shop" onclick="switchCategory('luxury')">Koleksi Luxury</a></li>
+                </ul>
+            </div>
+            <div class="footer-col newsletter">
+                <h4>Dapatkan Info Terbaru</h4>
+                <p style="font-size: 0.85rem; margin-bottom: 1.5rem; color: #999;">Daftar untuk promo eksklusif dan update koleksi terbaru.</p>
+                <input type="email" id="newsletter-input" placeholder="Alamat Email Anda">
+                <button class="btn newsletter-btn" style="border: 1px solid var(--secondary);">Berlangganan</button>
+            </div>
+        </div>
+        <div class="bottom-footer">
+            <p>&copy; 2026 LUXE.M Fashion Indonesia. All Rights Reserved.</p>
+            <div class="socials">
+                <i class="fa-brands fa-instagram" onclick="showToast('@luxem.id di Instagram')"></i>
+                <i class="fa-brands fa-facebook" onclick="showToast('Facebook: LUXE.M Indonesia')"></i>
+                <i class="fa-brands fa-tiktok" onclick="showToast('@luxem.id di TikTok')"></i>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
