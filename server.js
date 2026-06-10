@@ -37,6 +37,7 @@ const UPLOAD_DIR = path.join(PUBLIC_DIR, 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 app.use(express.static(PUBLIC_DIR));
+app.use(express.static(__dirname));
 
 // Image upload configuration
 const storage = multer.diskStorage({

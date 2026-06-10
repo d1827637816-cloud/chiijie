@@ -13,7 +13,9 @@ let midtransClientKey = '';
 let snapScriptUrl = '';
 let snapLoaded = false;
 
-const API_BASE = window.location.origin;
+const API_BASE = (window.location.origin && window.location.origin !== 'null')
+    ? window.location.origin
+    : 'http://localhost:3000';
 const ORDER_HISTORY_KEY = 'orderHistory';
 
 // --- Initialize ---
