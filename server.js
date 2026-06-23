@@ -75,11 +75,19 @@ async function getConnectionSafe() {
   }
 }
 
-// Midtrans Snap client
+// Midtrans Snap client configuration
+const isProduction = process.env.NODE_ENV === 'production';
+const midtransServerKey = isProduction
+  ? process.env.MIDTRANS_SERVER_KEY
+  : process.env.MIDTRANS_SANDBOX_SERVER_KEY || process.env.MIDTRANS_SERVER_KEY;
+const midtransClientKey = isProduction
+  ? process.env.MIDTRANS_CLIENT_KEY
+  : process.env.MIDTRANS_SANDBOX_CLIENT_KEY || process.env.MIDTRANS_CLIENT_KEY;
+
 const snapClient = new snap({
-  isProduction: process.env.NODE_ENV === 'production' || false,
-  serverKey: process.env.MIDTRANS_SERVER_KEY || 'YOUR_SERVER_KEY',
-  clientKey: process.env.MIDTRANS_CLIENT_KEY || 'YOUR_CLIENT_KEY'
+  isProduction,
+  serverKey: midtransServerKey || 'YOUR_SERVER_KEY',
+  clientKey: midtransClientKey || 'YOUR_CLIENT_KEY'
 });
 
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -335,12 +343,12 @@ app.get('/api/search', async (req, res) => {
 
 // Get payment configuration for client integration
 app.get('/api/payment/config', (req, res) => {
-  const snapUrl = process.env.NODE_ENV === 'production'
+  const snapUrl = isProduction
     ? 'https://app.midtrans.com/snap/snap.js'
     : 'https://app.sandbox.midtrans.com/snap/snap.js';
 
   res.json({
-    clientKey: process.env.MIDTRANS_CLIENT_KEY || 'YOUR_CLIENT_KEY',
+    clientKey: midtransClientKey || 'YOUR_CLIENT_KEY',
     snapUrl: process.env.MIDTRANS_SNAP_URL || snapUrl
   });
 });
@@ -355,10 +363,10 @@ app.post('/api/payment/create-token', async (req, res) => {
     }
 
     const selectedMethod = paymentMethod || 'bank_transfer_bca';
-    if (!process.env.MIDTRANS_SERVER_KEY || process.env.MIDTRANS_SERVER_KEY === 'YOUR_SERVER_KEY' ||
-        !process.env.MIDTRANS_CLIENT_KEY || process.env.MIDTRANS_CLIENT_KEY === 'YOUR_CLIENT_KEY') {
+    if (!midtransServerKey || midtransServerKey === 'YOUR_SERVER_KEY' ||
+        !midtransClientKey || midtransClientKey === 'YOUR_CLIENT_KEY') {
       return res.status(500).json({
-        error: 'Midtrans belum dikonfigurasi. Silakan set MIDTRANS_SERVER_KEY dan MIDTRANS_CLIENT_KEY di file .env.'
+        error: 'Midtrans belum dikonfigurasi. Silakan set MIDTRANS_SERVER_KEY/MIDTRANS_SANDBOX_SERVER_KEY dan MIDTRANS_CLIENT_KEY/MIDTRANS_SANDBOX_CLIENT_KEY di file .env.'
       });
     }
 
