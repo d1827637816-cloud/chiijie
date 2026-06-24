@@ -583,6 +583,79 @@ function applyVoucher() {
     showToast(`Promo "${code}" berhasil digunakan!`, 'success');
 }
 
+async function createOrderOnServer(payload) {
+    try {
+        const response = await fetch(`${API_BASE}/api/orders/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Order API gagal: ${response.status} ${errorBody}`);
+        }
+
+        const data = await response.json();
+        if (data.success) return data;
+        throw new Error(data.error || 'Order API tidak mengembalikan sukses');
+    } catch (error) {
+        console.warn('Order API unavailable, fallback lokal:', error.message);
+        return createLocalOrder(payload);
+    }
+}
+
+function createLocalOrder(payload) {
+    const orderId = 'LXM-' + String(Date.now()).slice(-8) + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+    const total = payload.subtotal + payload.shippingCost - payload.discount;
+    const savedOrders = JSON.parse(localStorage.getItem('luxeOrderHistory') || '[]');
+    savedOrders.push({
+        orderId,
+        createdAt: new Date().toISOString(),
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        email: payload.email,
+        phone: payload.phone,
+        address: payload.address,
+        city: payload.city,
+        province: payload.province,
+        postal: payload.postal,
+        shippingMethod: payload.shippingMethod,
+        paymentMethod: payload.paymentMethod,
+        cart: payload.cart,
+        subtotal: payload.subtotal,
+        shippingCost: payload.shippingCost,
+        discount: payload.discount,
+        total,
+        status: 'Menunggu Pembayaran',
+        fallback: true
+    });
+    localStorage.setItem('luxeOrderHistory', JSON.stringify(savedOrders));
+    return { success: true, orderId, total, fallback: true };
+}
+
+async function createPaymentToken(payload) {
+    try {
+        const response = await fetch(`${API_BASE}/api/payment/create-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Payment API gagal: ${response.status} ${errorBody}`);
+        }
+
+        const data = await response.json();
+        if (data.success) return data;
+        throw new Error(data.error || 'Payment API tidak mengembalikan sukses');
+    } catch (error) {
+        console.warn('Payment API unavailable, fallback lokal:', error.message);
+        return { success: false, error: 'Integrasi pembayaran belum tersedia. Pesanan akan diproses secara manual.' };
+    }
+}
+
 // --- PLACE ORDER & INITIATE PAYMENT ---
 async function placeOrder() {
     const btn = document.getElementById('place-order-btn');
@@ -606,28 +679,24 @@ async function placeOrder() {
         const total = subtotal + shippingCost - discount;
 
         // Step 1: Create order in database
-        const orderResponse = await fetch(`${API_BASE}/api/orders/create`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                firstName,
-                lastName,
-                email,
-                phone,
-                address,
-                city,
-                province,
-                postal,
-                shippingMethod,
-                paymentMethod,
-                cart,
-                subtotal,
-                shippingCost,
-                discount
-            })
-        });
+        const payload = {
+            firstName,
+            lastName,
+            email,
+            phone,
+            address,
+            city,
+            province,
+            postal,
+            shippingMethod,
+            paymentMethod,
+            cart,
+            subtotal,
+            shippingCost,
+            discount
+        };
 
-        const orderData = await orderResponse.json();
+        const orderData = await createOrderOnServer(payload);
         if (!orderData.success) {
             throw new Error(orderData.error || 'Gagal membuat pesanan');
         }
@@ -639,22 +708,16 @@ async function placeOrder() {
             await loadSnapLibrary();
         }
 
-        const paymentResponse = await fetch(`${API_BASE}/api/payment/create-token`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                orderId,
-                amount: total,
-                customerEmail: email,
-                customerName: `${firstName} ${lastName}`,
-                customerPhone: phone,
-                paymentMethod
-            })
+        const paymentData = await createPaymentToken({
+            orderId,
+            amount: total,
+            customerEmail: email,
+            customerName: `${firstName} ${lastName}`,
+            customerPhone: phone,
+            paymentMethod
         });
 
-        const paymentData = await paymentResponse.json();
         if (!paymentData.success) {
-            console.warn('Payment token creation failed:', paymentData.error);
             handleFallbackPayment(orderId, total, paymentMethod);
             return;
         }
@@ -742,6 +805,23 @@ function showToast(message, type = 'info') {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
+
+// Close success modal
+function closeSuccessModal() {
+    const modal = document.getElementById('success-modal');
+    if (modal) modal.classList.remove('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const closeSuccess = document.getElementById('close-success-modal');
+    if (closeSuccess) closeSuccess.addEventListener('click', closeSuccessModal);
+    const successModal = document.getElementById('success-modal');
+    if (successModal) {
+        successModal.addEventListener('click', (e) => {
+            if (e.target === successModal) closeSuccessModal();
+        });
+    }
+});
 
 // Expose for HTML onclick
 window.goToStep = goToStep;
