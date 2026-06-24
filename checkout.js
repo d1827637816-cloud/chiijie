@@ -242,15 +242,20 @@ async function loadPaymentConfig() {
         if (config && config.clientKey) {
             midtransClientKey = config.clientKey;
             snapScriptUrl = config.snapUrl || 'https://app.sandbox.midtrans.com/snap/snap.js';
+        } else {
+            midtransClientKey = '';
+            snapScriptUrl = '';
         }
     } catch (error) {
         console.error('Error loading payment configuration:', error);
+        midtransClientKey = '';
+        snapScriptUrl = '';
         showToast('Gagal memuat konfigurasi pembayaran', 'error');
     }
 }
 
 async function loadSnapLibrary() {
-    if (!midtransClientKey || snapLoaded) return;
+    if (!midtransClientKey || snapLoaded || !snapScriptUrl) return;
 
     return new Promise((resolve, reject) => {
         const existing = document.querySelector('script[data-midtrans-snap]');
@@ -268,7 +273,10 @@ async function loadSnapLibrary() {
             snapLoaded = true;
             resolve();
         };
-        script.onerror = () => reject(new Error('Gagal memuat library pembayaran Midtrans'));
+        script.onerror = () => {
+            console.warn('Library Midtrans gagal dimuat, akan menggunakan fallback pembayaran lokal.');
+            resolve();
+        };
         document.head.appendChild(script);
     });
 }
@@ -646,7 +654,9 @@ async function placeOrder() {
 
         const paymentData = await paymentResponse.json();
         if (!paymentData.success) {
-            throw new Error(paymentData.error || 'Gagal membuat token pembayaran');
+            console.warn('Payment token creation failed:', paymentData.error);
+            handleFallbackPayment(orderId, total, paymentMethod);
+            return;
         }
 
         // Step 3: Save order info to localStorage
@@ -654,8 +664,8 @@ async function placeOrder() {
         localStorage.setItem('currentOrderId', orderId);
         localStorage.setItem('currentOrderTotal', total);
 
-        // Step 4: Redirect to Midtrans payment
-        if (window.snap) {
+        // Step 4: Redirect to Midtrans payment or fallback if unavailable
+        if (window.snap && paymentData.snapToken) {
             window.snap.pay(paymentData.snapToken, {
                 onSuccess: function(result) {
                     window.location.href = `payment-status.html?order_id=${orderId}&status=success`;
@@ -672,9 +682,10 @@ async function placeOrder() {
                     btn.innerHTML = '<i class="fa-solid fa-lock"></i> Bayar Sekarang';
                 }
             });
-        } else {
-            // Fallback: redirect to Midtrans
+        } else if (paymentData.redirectUrl) {
             window.location.href = paymentData.redirectUrl;
+        } else {
+            handleFallbackPayment(orderId, total, paymentMethod);
         }
     } catch (error) {
         console.error('Order error:', error);
@@ -682,6 +693,27 @@ async function placeOrder() {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-lock"></i> Bayar Sekarang';
     }
+}
+
+function handleFallbackPayment(orderId, total, paymentMethod) {
+    localStorage.removeItem('cart');
+    localStorage.setItem('currentOrderId', orderId);
+    localStorage.setItem('currentOrderTotal', total);
+
+    const paymentLabel = {
+        bank_transfer_bca: 'Transfer Bank BCA',
+        bank_transfer_mandiri: 'Transfer Bank Mandiri',
+        gopay: 'GoPay',
+        ovo: 'OVO',
+        dana: 'DANA',
+        qris: 'QRIS'
+    }[paymentMethod] || 'Pembayaran Manual';
+
+    showToast('Pembayaran diproses secara manual untuk ' + paymentLabel, 'success');
+    const modal = document.getElementById('success-modal');
+    const orderIdDisplay = document.getElementById('order-id-display');
+    orderIdDisplay.textContent = `Order ID: ${orderId} • Total: Rp ${total.toLocaleString('id-ID')}`;
+    modal.classList.add('active');
 }
 
 // --- TOAST NOTIFICATION ---

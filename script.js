@@ -475,6 +475,10 @@ function showToast(message, type) {
 // ═══════════════════════════════════
 // GLOBAL EXPOSE
 // ═══════════════════════════════════
+function handleSearchClick(productId, cat) {
+    handleSearchResultClick(productId, cat);
+}
+
 window.removeFromCart    = removeFromCart;
 window.switchCategory    = switchCategory;
 window.showToast         = showToast;
