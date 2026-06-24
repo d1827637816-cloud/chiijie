@@ -131,13 +131,17 @@ function renderProducts(cat, filter) {
     var source = PRODUCTS[cat] || [];
     var items  = filter === 'all' ? source : source.filter(function(p) { return p.cat === filter; });
 
-    // Remove duplicate products (by id) to avoid rendering the same item multiple times
-    var seenIds = {};
+    // Remove duplicate products by id or by normalized name+brand to avoid rendering duplicates
+    var seen = {};
     var uniqueItems = [];
     items.forEach(function(p) {
-        if (!p || !p.id) return;
-        if (!seenIds[p.id]) {
-            seenIds[p.id] = true;
+        if (!p) return;
+        var name = (p.name || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
+        var brand = (p.brand || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
+        var key = (p.id && p.id.toString()) || (name + '|' + brand);
+        if (!key) return;
+        if (!seen[key]) {
+            seen[key] = true;
             uniqueItems.push(p);
         }
     });
