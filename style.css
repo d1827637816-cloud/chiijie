@@ -203,35 +203,58 @@ header {
 .modal-content p { color: var(--text-muted); margin-bottom: 2rem; }
 .modal-content input {
     width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-family: inherit;
+}
+
+/* Brand / Partner strip (improved layout) */
 .brand-footer {
-    background: #ffffff;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);
     border-top: 1px solid var(--border);
-    padding: 2rem 4rem;
+    padding: 2rem 1.5rem;
 }
 .brand-footer-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1.25rem;
-    align-items: start;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem 1.5rem;
+    align-items: center;
     max-width: 1200px;
     margin: 0 auto;
 }
+.bf-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
 .bf-col h4 {
-    font-size: 0.9rem;
-    margin-bottom: 0.6rem;
+    font-size: 0.85rem;
+    margin: 0;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
+    color: var(--text-main);
 }
-.bf-logo {
-    font-weight: 700;
-    font-size: 1rem;
+.bf-logo { font-weight: 800; font-size: 1.05rem; color: var(--primary); }
+.bf-flags { font-size: 1rem; color: var(--text-muted); }
+.bf-logos { display: flex; gap: 0.6rem; align-items: center; }
+.bf-logos i { font-size: 1.15rem; color: #333; background: #f4f6fb; padding: 0.45rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(17,17,17,0.04); }
+.bf-security { list-style: none; padding: 0; margin: 0; color: var(--text-muted); }
+.bf-security li { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.45rem; }
+.bf-security li i { color: #27ae60; }
+
+@media (max-width: 900px) {
+    .brand-footer { padding: 1.5rem; }
+    .brand-footer-grid { grid-template-columns: repeat(2, 1fr); }
+    .bf-logos i { font-size: 1.2rem; }
 }
-.bf-flags { font-size: 1.25rem; }
-.bf-logos i { font-size: 1.4rem; margin-right: 0.8rem; color: #333; }
-.bf-security { list-style: none; padding: 0; margin: 0; }
-.bf-security li { margin-bottom: 0.6rem; color: #444; }
-.bf-security li i { color: #27ae60; margin-right: 0.6rem; }
-    padding: 1rem;
+@media (max-width: 480px) {
+    .brand-footer-grid { grid-template-columns: 1fr; }
+    .brand-footer { padding: 1rem; }
+    .bf-col { align-items: flex-start; }
+}
 @media (max-width: 900px) {
     .brand-footer-grid { grid-template-columns: 1fr 1fr; }
 }
