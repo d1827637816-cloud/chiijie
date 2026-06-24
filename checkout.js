@@ -13,11 +13,14 @@ let midtransClientKey = '';
 let snapScriptUrl = '';
 let snapLoaded = false;
 
+let localOnlyMode = false;
+
 const API_BASE = (() => {
     const origin = window.location.origin || '';
     if (origin.includes('github.io') || origin.includes('page')) {
-        console.warn('Detected GitHub Pages origin, using local API backend.');
-        return 'http://localhost:3000';
+        console.warn('Detected static GitHub Pages origin, enabling local-only checkout mode.');
+        localOnlyMode = true;
+        return origin;
     }
     if (origin && origin !== 'null') {
         return origin;
@@ -237,6 +240,11 @@ async function loadShippingCosts(province, city) {
 // --- Load Midtrans payment configuration ---
 async function loadPaymentConfig() {
     try {
+        if (localOnlyMode) {
+            midtransClientKey = '';
+            snapScriptUrl = '';
+            return;
+        }
         const response = await fetch(`${API_BASE}/api/payment/config`);
         const config = await response.json();
         if (config && config.clientKey) {
@@ -250,7 +258,9 @@ async function loadPaymentConfig() {
         console.error('Error loading payment configuration:', error);
         midtransClientKey = '';
         snapScriptUrl = '';
-        showToast('Gagal memuat konfigurasi pembayaran', 'error');
+        if (!localOnlyMode) {
+            showToast('Gagal memuat konfigurasi pembayaran', 'error');
+        }
     }
 }
 
@@ -608,7 +618,14 @@ async function createOrderOnServer(payload) {
 function createLocalOrder(payload) {
     const orderId = 'LXM-' + String(Date.now()).slice(-8) + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
     const total = payload.subtotal + payload.shippingCost - payload.discount;
-    const savedOrders = JSON.parse(localStorage.getItem('luxeOrderHistory') || '[]');
+    let savedOrders = [];
+    try {
+        savedOrders = JSON.parse(localStorage.getItem('luxeOrderHistory') || '[]');
+        if (!Array.isArray(savedOrders)) savedOrders = [];
+    } catch (parseError) {
+        console.warn('Invalid order history data in localStorage, resetting.', parseError.message);
+        savedOrders = [];
+    }
     savedOrders.push({
         orderId,
         createdAt: new Date().toISOString(),
@@ -636,6 +653,10 @@ function createLocalOrder(payload) {
 
 async function createPaymentToken(payload) {
     try {
+        if (localOnlyMode) {
+            console.warn('Payment API skipped in local-only mode.');
+            return { success: false, error: 'Local-only payment fallback active' };
+        }
         const response = await fetch(`${API_BASE}/api/payment/create-token`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -777,6 +798,11 @@ function handleFallbackPayment(orderId, total, paymentMethod) {
     const orderIdDisplay = document.getElementById('order-id-display');
     orderIdDisplay.textContent = `Order ID: ${orderId} • Total: Rp ${total.toLocaleString('id-ID')}`;
     modal.classList.add('active');
+    const btn = document.getElementById('place-order-btn');
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-lock"></i> Bayar Sekarang';
+    }
 }
 
 // --- TOAST NOTIFICATION ---

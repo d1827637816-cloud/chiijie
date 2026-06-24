@@ -22,6 +22,12 @@
             <button id="status-check" class="btn" style="background:#000;color:#fff; border:none; padding:1rem 1.8rem;">Cek Status</button>
         </div>
         <div id="status-result"></div>
+
+        <section id="order-history" style="margin-top:2.5rem;">
+            <h2 style="font-size:1.4rem; margin-bottom:0.6rem;">Riwayat Pesanan Anda</h2>
+            <p style="color:#666; margin-bottom:1rem;">Pesanan yang dibuat di perangkat ini (termasuk pesanan fallback) akan muncul di bawah.</p>
+            <div id="orders-list" style="display:grid; grid-template-columns:1fr; gap:1rem;"></div>
+        </section>
     </main>
     <script src="status.js"></script>
 </body>
