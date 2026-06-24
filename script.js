@@ -131,6 +131,18 @@ function renderProducts(cat, filter) {
     var source = PRODUCTS[cat] || [];
     var items  = filter === 'all' ? source : source.filter(function(p) { return p.cat === filter; });
 
+    // Remove duplicate products (by id) to avoid rendering the same item multiple times
+    var seenIds = {};
+    var uniqueItems = [];
+    items.forEach(function(p) {
+        if (!p || !p.id) return;
+        if (!seenIds[p.id]) {
+            seenIds[p.id] = true;
+            uniqueItems.push(p);
+        }
+    });
+    items = uniqueItems;
+
     var grid  = el('product-grid');
     var noRes = el('no-results');
 
